@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Mindful Balance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Layout */
+        .dashboard-container {
+            display: flex;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            position: fixed;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #f5f7fa;
+            color: #667eea;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(90deg, #e3f2fd 0%, transparent 100%);
+            color: #667eea;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .menu-icon {
+            font-size: 1.3rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            flex: 1;
+            width: calc(100% - 250px);
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .date {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+        }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .action-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .action-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f5f7fa;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .activity-item:hover {
+            background: #e3f2fd;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-details h4 {
+            color: #333;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .activity-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .activity-date {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .activity-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🌸 Mindful Balance</div>
+            <div class="user-menu">
+                <span class="user-name" id="userName">User</span>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item active">
+                    <span class="menu-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="assessment.html" class="menu-item">
+                    <span class="menu-icon">🧠</span>
+                    <span>Stress Check</span>
+                </a>
+                <a href="history.html" class="menu-item">
+                    <span class="menu-icon">📜</span>
+                    <span>History</span>
+                </a>
+                <a href="games.html" class="menu-item">
+                    <span class="menu-icon">🎮</span>
+                    <span>Relax</span>
+                </a>
+                <a href="profile.html" class="menu-item">
+                    <span class="menu-icon">👤</span>
+                    <span>Profile</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <h1>Welcome back, <span id="userNameDisplay">User</span>! 👋</h1>
+                <p class="date" id="currentDate"></p>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <h3 id="totalAssessments">0</h3>
+                        <p>Total Assessments</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3 id="currentLevel">N/A</h3>
+                        <p>Current Stress Level</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-info">
+                        <h3 id="streak">0</h3>
+                        <p>Day Streak</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-info">
+                        <h3 id="points">0</h3>
+                        <p>Total Points</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2 class="section-title">Quick Actions</h2>
+                <div class="action-grid">
+                    <a href="assessment.html" class="action-card">
+                        <span class="action-icon">🧠</span>
+                        <h3>Take Assessment</h3>
+                        <p>Check your stress level</p>
+                    </a>
+                    
+                    <a href="games.html" class="action-card">
+                        <span class="action-icon">🎮</span>
+                        <h3>Play Games</h3>
+                        <p>Relax your mind</p>
+                    </a>
+                    
+                    <a href="history.html" class="action-card">
+                        <span class="action-icon">📊</span>
+                        <h3>View History</h3>
+                        <p>Track your progress</p>
+                    </a>
+                    
+                    <a href="profile.html" class="action-card">
+                        <span class="action-icon">⚙️</span>
+                        <h3>Settings</h3>
+                        <p>Manage your account</p>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="recent-activity">
+                <h2 class="section-title">Recent Assessments</h2>
+                <div id="recentAssessments" class="activity-list">
+                    <div class="loading">Loading...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        // Check authentication
+        if (!requireAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        const user = getCurrentUser();
+
+        // Display user info
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userNameDisplay').textContent = user.name;
+
+        // Display current date
+        const today = new Date();
+        document.getElementById('currentDate').textContent = 
+            today.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const result = await AssessmentAPI.getUserAssessments(user.id);
+                
+                if (result.success) {
+                    const assessments = result.data;
+                    
+                    // Update stats
+                    document.getElementById('totalAssessments').textContent = assessments.length;
+                    
+                    if (assessments.length > 0) {
+                        const latest = assessments[0];
+                        const levelEl = document.getElementById('currentLevel');
+                        levelEl.textContent = latest.stressLevel;
+                        
+                        // Set color based on level
+                        if (latest.stressLevel === 'Low') {
+                            levelEl.style.color = '#4caf50';
+                        } else if (latest.stressLevel === 'Moderate') {
+                            levelEl.style.color = '#ff9800';
+                        } else {
+                            levelEl.style.color = '#f44336';
+                        }
+                        
+                        // Display recent assessments
+                        displayRecentAssessments(assessments.slice(0, 5));
+                    } else {
+                        document.getElementById('recentAssessments').innerHTML = 
+                            '<p class="no-data">No assessments yet. Take your first assessment!</p>';
+                    }
+                    
+                    // Calculate streak
+                    document.getElementById('streak').textContent = calculateStreak(assessments);
+                    
+                    // Calculate points
+                    document.getElementById('points').textContent = assessments.length * 10;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('recentAssessments').innerHTML = 
+                    '<p class="no-data">Failed to load data</p>';
+            }
+        }
+
+        function displayRecentAssessments(assessments) {
+            const container = document.getElementById('recentAssessments');
+            
+            container.innerHTML = assessments.map(assessment => {
+                const date = new Date(assessment.assessmentDate);
+                const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                
+                let levelColor = '#4caf50';
+                let emoji = '😊';
+                if (assessment.stressLevel === 'Moderate') {
+                    levelColor = '#ff9800';
+                    emoji = '😐';
+                }
+                if (assessment.stressLevel === 'High') {
+                    levelColor = '#f44336';
+                    emoji = '😟';
+                }
+                
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: ${levelColor};">
+                            ${emoji}
+                        </div>
+                        <div class="activity-details">
+                            <h4>Stress Level: ${assessment.stressLevel}</h4>
+                            <p>Score: ${assessment.score}/15</p>
+                            <span class="activity-date">${formattedDate}</span>
+                        </div>
+                        <div class="activity-badge" style="background: ${levelColor};">
+                            ${assessment.score}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateStreak(assessments) {
+            if (assessments.length === 0) return 0;
+            
+            let streak = 1;
+            const today = new Date().setHours(0, 0, 0, 0);
+            
+            for (let i = 0; i < assessments.length - 1; i++) {
+                const date1 = new Date(assessments[i].assessmentDate).setHours(0, 0, 0, 0);
+                const date2 = new Date(assessments[i + 1].assessmentDate).setHours(0, 0, 0, 0);
+                const diffDays = (date1 - date2) / (1000 * 60 * 60 * 24);
+                
+                if (diffDays === 1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // Load dashboard on page load
+        loadDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8eaf6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #1976d2;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1a237e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            color: #5c6bc0;
+            margin-top: 10px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 100px;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Assessment Card */
+        .assessment-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .assessment-card h2 {
+            color: #1976d2;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .start-assessment-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1976d2 0%, #3f51b5 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .start-assessment-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+        }
+
+        /* Assessment Test Modal */
+        .assessment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .assessment-modal.active {
+            display: flex;
+        }
+
+        .assessment-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .assessment-modal h2 {
+            color: #1976d2;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .question-section {
+            margin-bottom: 30px;
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .scale-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .scale-option {
+            flex: 1;
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .scale-option:hover {
+            border-color: #1976d2;
+            background: #e3f2fd;
+        }
+
+        .scale-option.selected {
+            border-color: #1976d2;
+            background: #1976d2;
+            color: white;
+        }
+
+        .submit-assessment-btn {
+            width: 100%;
+            padding: 15px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .submit-assessment-btn:hover {
+            background: #1565c0;
+        }
+
+        .close-modal-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .results-section {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .stress-level {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .stress-low { color: #4caf50; }
+        .stress-moderate { color: #ff9800; }
+        .stress-high { color: #f44336; }
+
+        .recommendations {
+            text-align: left;
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .recommendations li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .history-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .history-card h2 {
+            color: #1976d2;
+            margin-bottom: 20px;
+        }
+
+        .failed-box {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Floating Chat Button */
+        .chat-float-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1976d2 0%, #3f51b5 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(25, 118, 210, 0.4);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .chat-float-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(25, 118, 210, 0.6);
+        }
+
+        /* Floating Chat Window */
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 400px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-window.active {
+            display: flex;
+        }
+
+        .chat-window-header {
+            background: linear-gradient(135deg, #1976d2 0%, #3f51b5 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-window-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-window-header-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .close-chat-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .chat-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        .chat-message.bot .chat-avatar {
+            background: #1976d2;
+            color: white;
+        }
+
+        .chat-message.user .chat-avatar {
+            background: #ddd;
+            color: #666;
+        }
+
+        .chat-bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            white-space: pre-line;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .chat-message.bot .chat-bubble {
+            background: white;
+            color: #333;
+            border-radius: 15px 15px 15px 3px;
+        }
+
+        .chat-message.user .chat-bubble {
+            background: #1976d2;
+            color: white;
+            border-radius: 15px 15px 3px 15px;
+        }
+
+        .sentiment-badge {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sentiment-positive {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .sentiment-negative {
+            background: #ffcdd2;
+            color: #c62828;
+        }
+
+        .sentiment-neutral {
+            background: #e0e0e0;
+            color: #616161;
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            background: white;
+            border-radius: 0 0 20px 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-container input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chat-input-container input:focus {
+            border-color: #1976d2;
+        }
+
+        .chat-send-btn {
+            width: 40px;
+            height: 40px;
+            background: #1976d2;
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+
+        .chat-send-btn:hover:not(:disabled) {
+            background: #1565c0;
+            transform: scale(1.05);
+        }
+
+        .chat-send-btn:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 4px;
+            padding: 10px 14px;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #1976d2;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .debug-info {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 11px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+        
+        <div class="header">
+            <h1><span>📋</span> Assessment History</h1>
+            <p>Take stress assessments and chat with our AI assistant</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Assessment Card -->
+            <div class="assessment-card">
+                <h2>🧠 Take Stress Assessment</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Take a quick 4-question assessment to evaluate your current stress level and receive personalized recommendations.
+                </p>
+                <button class="start-assessment-btn" onclick="startAssessment()">
+                    Start Assessment
+                </button>
+            </div>
+
+            <!-- History Card -->
+            <div class="history-card">
+                <h2>📊 Previous Assessments</h2>
+                <div class="failed-box">
+                    No assessment history available
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessment Modal -->
+    <div class="assessment-modal" id="assessmentModal">
+        <div class="assessment-modal-content">
+            <button class="close-modal-btn" onclick="closeAssessment()">✕</button>
+            <h2>Stress Level Assessment</h2>
+            
+            <div id="assessmentQuestions">
+                <div class="question-section">
+                    <p class="question-text">1. On a scale of 1-10, how stressed do you feel right now?</p>
+                    <div class="scale-options" id="q1"></div>
+                </div>
+
+                <div class="question-section">
+                    <p class="question-text">2. How well have you been sleeping lately?</p>
+                    <div class="scale-options" id="q2"></div>
+                </div>
+
+                <div class="question-section">
+                    <p class="question-text">3. How often do you feel overwhelmed?</p>
+                    <div class="scale-options" id="q3"></div>
+                </div>
+
+                <div class="question-section">
+                    <p class="question-text">4. Are you able to relax and unwind easily?</p>
+                    <div class="scale-options" id="q4"></div>
+                </div>
+
+                <button class="submit-assessment-btn" onclick="submitAssessment()">
+                    Submit Assessment
+                </button>
+            </div>
+
+            <div class="results-section" id="resultsSection"></div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <button class="chat-float-btn" onclick="toggleChat()">💬</button>
+
+    <!-- Floating Chat Window -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-window-header">
+            <div class="chat-window-header-left">
+                <div class="chat-window-header-icon">🤖</div>
+                <div>
+                    <div style="font-weight: bold;">Mental Health Assistant</div>
+                    <div style="font-size: 12px; opacity: 0.9;">Always here to help</div>
+                </div>
+            </div>
+            <button class="close-chat-btn" onclick="toggleChat()">×</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages"></div>
+
+        <div class="chat-input-area">
+            <div class="chat-input-container">
+                <input 
+                    type="text" 
+                    id="chatInput" 
+                    placeholder="Type your message..."
+                    onkeypress="handleChatKeyPress(event)"
+                >
+                <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">➤</button>
+            </div>
+            <div id="chatError"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIGURATION - UPDATE THESE VALUES =====
+        const API_BASE_URL = 'http://localhost:8080';
+        const USER_ID = 1; // Replace with actual logged-in user ID
+        // ==============================================
+
+        // Assessment variables
+        const assessmentAnswers = { q1: null, q2: null, q3: null, q4: null };
+
+        // Chat variables
+        let isChatLoading = false;
+        let chatInitialized = false;
+
+        // ===== ASSESSMENT FUNCTIONS =====
+        function initAssessment() {
+            for (let i = 1; i <= 4; i++) {
+                const container = document.getElementById(`q${i}`);
+                for (let j = 1; j <= 10; j++) {
+                    const option = document.createElement('div');
+                    option.className = 'scale-option';
+                    option.textContent = j;
+                    option.onclick = () => selectOption(i, j, option);
+                    container.appendChild(option);
+                }
+            }
+        }
+
+        function selectOption(question, value, element) {
+            const container = element.parentElement;
+            container.querySelectorAll('.scale-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            assessmentAnswers[`q${question}`] = value;
+        }
+
+        function startAssessment() {
+            document.getElementById('assessmentModal').classList.add('active');
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('assessmentQuestions').style.display = 'block';
+        }
+
+        function closeAssessment() {
+            document.getElementById('assessmentModal').classList.remove('active');
+            Object.keys(assessmentAnswers).forEach(key => assessmentAnswers[key] = null);
+            document.querySelectorAll('.scale-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        }
+
+        function submitAssessment() {
+            if (Object.values(assessmentAnswers).some(val => val === null)) {
+                alert('Please answer all questions before submitting.');
+                return;
+            }
+
+            const q1 = assessmentAnswers.q1;
+            const q2 = 11 - assessmentAnswers.q2;
+            const q3 = assessmentAnswers.q3;
+            const q4 = 11 - assessmentAnswers.q4;
+            
+            const totalScore = q1 + q2 + q3 + q4;
+            const normalizedScore = Math.round((totalScore / 40) * 10);
+
+            showResults(normalizedScore);
+        }
+
+        function showResults(score) {
+            let level, color, recommendations;
+
+            if (score <= 3) {
+                level = 'Low Stress';
+                color = 'stress-low';
+                recommendations = [
+                    'Keep up the great work with your stress management!',
+                    'Continue your current healthy habits like regular exercise',
+                    'Practice gratitude journaling to maintain positive mental health',
+                    'Engage in hobbies that bring you joy'
+                ];
+            } else if (score <= 5) {
+                level = 'Moderate Stress';
+                color = 'stress-moderate';
+                recommendations = [
+                    'Your stress is manageable but needs attention',
+                    'Try deep breathing exercises - inhale for 4, hold for 4, exhale for 4',
+                    'Take regular breaks during work (5-10 minutes every hour)',
+                    'Go for a 20-minute walk in nature',
+                    'Practice mindfulness meditation for 10 minutes daily'
+                ];
+            } else if (score <= 7) {
+                level = 'High Stress';
+                color = 'stress-high';
+                recommendations = [
+                    'Your stress level is concerning. Let\'s work on reducing it',
+                    'Set boundaries and learn to say "no" to additional responsibilities',
+                    'Try progressive muscle relaxation',
+                    'Limit caffeine and get 7-8 hours of sleep',
+                    'Consider talking to someone you trust about your feelings'
+                ];
+            } else {
+                level = 'Very High Stress';
+                color = 'stress-high';
+                recommendations = [
+                    'Your stress level is very high. Please take immediate action',
+                    'Consider speaking with a mental health professional',
+                    'Practice box breathing - breathe in 4, hold 4, out 4, hold 4',
+                    'Create a daily routine with relaxation time built in',
+                    'Reach out to supportive friends or family members',
+                    'Consider counseling or therapy services'
+                ];
+            }
+
+            const resultsHTML = `
+                <h3>Your Results</h3>
+                <div class="stress-level ${color}">${level} (${score}/10)</div>
+                <div class="recommendations">
+                    <h4>Recommendations:</h4>
+                    <ul>${recommendations.map(rec => `<li>${rec}</li>`).join('')}</ul>
+                </div>
+                <button class="start-assessment-btn" onclick="closeAssessment()">Close</button>
+            `;
+
+            document.getElementById('assessmentQuestions').style.display = 'none';
+            document.getElementById('resultsSection').innerHTML = resultsHTML;
+            document.getElementById('resultsSection').classList.add('active');
+        }
+
+        // ===== CHAT FUNCTIONS =====
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            const isActive = chatWindow.classList.toggle('active');
+            
+            if (isActive && !chatInitialized) {
+                initializeChat();
+                chatInitialized = true;
+            }
+        }
+
+        function initializeChat() {
+            addBotChatMessage("Hello! I'm here to support you with your mental health and stress management. How are you feeling today?", "NEUTRAL");
+            testConnection();
+        }
+
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/chat/health`);
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log('✅ Backend connection successful:', text);
+                } else {
+                    console.error('❌ Backend health check failed:', response.status);
+                    showChatError('Warning: Cannot connect to backend at ' + API_BASE_URL);
+                }
+            } catch (error) {
+                console.error('❌ Backend not reachable:', error);
+                showChatError('Backend server not running at ' + API_BASE_URL);
+            }
+        }
+
+        function addBotChatMessage(text, sentiment) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message bot';
+            
+            let sentimentBadge = '';
+            if (sentiment) {
+                const badgeClass = sentiment === 'POSITIVE' ? 'sentiment-positive' : 
+                                   sentiment === 'NEGATIVE' ? 'sentiment-negative' : 'sentiment-neutral';
+                sentimentBadge = `<div><span class="sentiment-badge ${badgeClass}">${sentiment}</span></div>`;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="chat-avatar">🤖</div>
+                <div>
+                    <div class="chat-bubble">${escapeHtml(text)}</div>
+                    ${sentimentBadge}
+                </div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addUserChatMessage(text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message user';
+            messageDiv.innerHTML = `
+                <div class="chat-avatar">👤</div>
+                <div class="chat-bubble">${escapeHtml(text)}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showChatLoading() {
+            const chatMessages = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chat-message bot';
+            loadingDiv.id = 'chatLoading';
+            loadingDiv.innerHTML = `
+                <div class="chat-avatar">🤖</div>
+                <div class="chat-bubble loading-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeChatLoading() {
+            const loading = document.getElementById('chatLoading');
+            if (loading) loading.remove();
+        }
+
+        function showChatError(message) {
+            const errorDiv = document.getElementById('chatError');
+            errorDiv.innerHTML = `<div class="error-message">${message}</div>`;
+            setTimeout(() => errorDiv.innerHTML = '', 5000);
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter' && !isChatLoading) {
+                sendChatMessage();
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('chatSendBtn');
+            const message = input.value.trim();
+            
+            if (!message || isChatLoading) return;
+            
+            isChatLoading = true;
+            input.disabled = true;
+            sendBtn.disabled = true;
+            
+            addUserChatMessage(message);
+            input.value = '';
+            showChatLoading();
+            
+            // Prepare request exactly matching ChatMessageDTO
+            const requestData = {
+                userId: USER_ID,
+                message: message
+            };
+            
+            console.log('📤 Sending request to:', `${API_BASE_URL}/api/chat/send`);
+            console.log('📦 Request data:', JSON.stringify(requestData, null, 2));
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/chat/send`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                removeChatLoading();
+                
+                console.log('📥 Response status:', response.status);
+                console.log('📥 Response headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Response data:', JSON.stringify(data, null, 2));
+                    
+                    // Extract response matching ChatResponseDTO structure
+                    const botMessage = data.responseText || 'I received your message.';
+                    const sentiment = data.sentiment || 'NEUTRAL';
+                    
+                    addBotChatMessage(botMessage, sentiment);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Error response:', errorText);
+                    throw new Error(`Server error ${response.status}`);
+                }
+            } catch (error) {
+                console.error('❌ Request failed:', error);
+                removeChatLoading();
+                addBotChatMessage("I'm having trouble connecting. Please ensure:\n1. Backend is running at " + API_BASE_URL + "\n2. User with ID " + USER_ID + " exists\n3. CORS is enabled\n4. ChatbotController is configured", "NEUTRAL");
+                showChatError('Error: ' + error.message);
+            } finally {
+                isChatLoading = false;
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            initAssessment();
+            console.log('🚀 Page initialized');
+            console.log('⚙️ Configuration:', { API_BASE_URL, USER_ID });
+        });
+    </script>
+</body>
+</html>

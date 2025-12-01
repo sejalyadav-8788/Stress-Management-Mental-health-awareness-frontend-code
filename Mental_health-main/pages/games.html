@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relaxation Games - Mindful Balance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .game-container.active {
+            display: block;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .btn-back {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Breathing Exercise */
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 3rem auto;
+            animation: breathe 8s infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+        }
+
+        .breathing-text {
+            text-align: center;
+            font-size: 1.8rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* Memory Game */
+        #memoryGame {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+            justify-content: center;
+            margin: 2rem auto;
+        }
+
+        .memory-card {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            transition: all 0.3s;
+            color: transparent;
+        }
+
+        .memory-card:hover {
+            transform: scale(1.05);
+        }
+
+        .memory-card.flipped {
+            background: white;
+            border: 2px solid #667eea;
+            color: black;
+        }
+
+        .memory-card.matched {
+            background: #4caf50;
+            cursor: default;
+            color: white;
+        }
+
+        /* Drawing Canvas */
+        #drawingCanvas {
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            cursor: crosshair;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .canvas-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-control {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #memoryGame {
+                grid-template-columns: repeat(4, 70px);
+            }
+
+            .memory-card {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+
+            #drawingCanvas {
+                width: 100%;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+        
+        <div class="header">
+            <h1>🎮 Relaxation & Mindfulness Games</h1>
+            <p>Take a break and relax your mind</p>
+        </div>
+
+        <!-- Games Selection -->
+        <div id="gamesSelection" class="games-grid">
+            <div class="game-card" onclick="showGame('breathing')">
+                <div class="game-icon">🫁</div>
+                <h3>Breathing Exercise</h3>
+                <p>Follow the circle to practice deep breathing and reduce anxiety</p>
+            </div>
+
+            <div class="game-card" onclick="showGame('memory')">
+                <div class="game-icon">🧩</div>
+                <h3>Memory Match</h3>
+                <p>A gentle memory game to focus your mind and relax</p>
+            </div>
+
+            <div class="game-card" onclick="showGame('drawing')">
+                <div class="game-icon">🎨</div>
+                <h3>Zen Drawing</h3>
+                <p>Create calming patterns and express yourself freely</p>
+            </div>
+        </div>
+
+        <!-- Breathing Exercise -->
+        <div id="breathingGame" class="game-container">
+            <div class="game-header">
+                <h2>🫁 Deep Breathing Exercise</h2>
+                <button class="btn-back" onclick="backToGames()">Back</button>
+            </div>
+            <p style="text-align: center; color: #666; margin-bottom: 2rem;">
+                Follow the circle: Breathe in as it grows, breathe out as it shrinks
+            </p>
+            <div class="breathing-circle"></div>
+            <div class="breathing-text" id="breathingText">Breathe In...</div>
+        </div>
+
+        <!-- Memory Game -->
+        <div id="memoryGameContainer" class="game-container">
+            <div class="game-header">
+                <h2>🧩 Memory Match Game</h2>
+                <button class="btn-back" onclick="backToGames()">Back</button>
+            </div>
+            <p style="text-align: center; color: #666; margin-bottom: 1rem;">
+                Match the pairs. Take your time and relax! 🧘
+            </p>
+            <div id="memoryGame"></div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn-control btn-primary" onclick="startMemoryGame()">New Game</button>
+            </div>
+        </div>
+
+        <!-- Drawing Canvas -->
+        <div id="drawingGameContainer" class="game-container">
+            <div class="game-header">
+                <h2>🎨 Zen Drawing Canvas</h2>
+                <button class="btn-back" onclick="backToGames()">Back</button>
+            </div>
+            <p style="text-align: center; color: #666; margin-bottom: 1rem;">
+                Draw anything you like. Let your creativity flow!
+            </p>
+            <canvas id="drawingCanvas" width="800" height="500"></canvas>
+            <div class="canvas-controls">
+                <button class="btn-control btn-primary" onclick="clearCanvas()">Clear Canvas</button>
+                <input type="color" id="colorPicker" value="#667eea" style="height: 40px; cursor: pointer;">
+                <input type="range" id="brushSize" min="1" max="20" value="3" style="width: 150px;">
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/utils.js"></script>
+    <script>
+        if (!requireAuth()) {
+            window.location.href = 'login.html';
+        }
+
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let drawing = false;
+        let ctx = null;
+
+        function showGame(gameType) {
+            document.getElementById('gamesSelection').style.display = 'none';
+            document.getElementById('breathingGame').classList.remove('active');
+            document.getElementById('memoryGameContainer').classList.remove('active');
+            document.getElementById('drawingGameContainer').classList.remove('active');
+
+            if (gameType === 'breathing') {
+                document.getElementById('breathingGame').classList.add('active');
+                startBreathingExercise();
+            } else if (gameType === 'memory') {
+                document.getElementById('memoryGameContainer').classList.add('active');
+                startMemoryGame();
+            } else if (gameType === 'drawing') {
+                document.getElementById('drawingGameContainer').classList.add('active');
+                initDrawingCanvas();
+            }
+        }
+
+        function backToGames() {
+            document.getElementById('gamesSelection').style.display = 'grid';
+            document.getElementById('breathingGame').classList.remove('active');
+            document.getElementById('memoryGameContainer').classList.remove('active');
+            document.getElementById('drawingGameContainer').classList.remove('active');
+        }
+
+        // Breathing Exercise
+        function startBreathingExercise() {
+            const text = document.getElementById('breathingText');
+            let isInhale = true;
+
+            setInterval(() => {
+                if (isInhale) {
+                    text.textContent = "Breathe In...";
+                    setTimeout(() => {
+                        text.textContent = "Breathe Out...";
+                    }, 4000);
+                }
+                isInhale = !isInhale;
+            }, 8000);
+        }
+
+        // Memory Game
+        function startMemoryGame() {
+            const emojis = ['🌸', '🌺', '🌻', '🌷', '🌼', '🌹', '🍀', '🌿'];
+            const gameEmojis = [...emojis, ...emojis];
+            gameEmojis.sort(() => Math.random() - 0.5);
+            
+            const gameBoard = document.getElementById('memoryGame');
+            gameBoard.innerHTML = '';
+            memoryCards = [];
+            flippedCards = [];
+            matchedPairs = 0;
+            
+            gameEmojis.forEach((emoji, idx) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.emoji = emoji;
+                card.dataset.index = idx;
+                card.textContent = '?';
+                card.onclick = () => flipCard(card);
+                gameBoard.appendChild(card);
+                memoryCards.push(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+            
+            card.classList.add('flipped');
+            card.textContent = card.dataset.emoji;
+            flippedCards.push(card);
+            
+            if (flippedCards.length === 2) {
+                setTimeout(checkMatch, 1000);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.emoji === card2.dataset.emoji) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                
+                if (matchedPairs === 8) {
+                    setTimeout(() => {
+                        showToast('Congratulations! You matched all pairs! 🎉', 'success');
+                    }, 500);
+                }
+            } else {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                card1.textContent = '?';
+                card2.textContent = '?';
+            }
+            
+            flippedCards = [];
+        }
+
+        // Drawing Canvas
+        function initDrawingCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            ctx = canvas.getContext('2d');
+            
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#667eea';
+            
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch support
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                drawing = true;
+                ctx.beginPath();
+                ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (drawing) {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+                    ctx.stroke();
+                }
+            });
+            
+            canvas.addEventListener('touchend', () => drawing = false);
+
+            // Color picker
+            document.getElementById('colorPicker').addEventListener('change', (e) => {
+                ctx.strokeStyle = e.target.value;
+            });
+
+            // Brush size
+            document.getElementById('brushSize').addEventListener('input', (e) => {
+                ctx.lineWidth = e.target.value;
+            });
+        }
+
+        function startDrawing(e) {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+        }
+
+        function stopDrawing() {
+            drawing = false;
+        }
+
+        function clearCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>
